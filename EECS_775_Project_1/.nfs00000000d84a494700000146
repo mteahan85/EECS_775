@@ -1,0 +1,76 @@
+/**
+ * @file Main.cpp
+ *@author Megan Teahan <mteahan@ku.edu>
+ *@version 1.0
+ *
+ *@section DESCRIPTION
+ *
+ */
+
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <stdio.h>
+
+
+//#include "Grid.h"
+
+
+
+
+/**
+ * 
+ *Constructor that takes in one text file and opens it, then sending it to the Executive class.
+ *
+ *@param char* argv[] it is an array of text files passed into the program
+ *	
+ *@return returns an int to terminate the program after it has been completely used. 
+ *
+ */
+
+int main(int argc, char* argv[ ])
+{
+  //opens the stream and checks if it opened correctly
+  std::ifstream s1;
+  s1.open(argv[1]);
+  if(!s1.is_open())	
+  {
+    std::cout << "Error: the file could not be opened properly. The program will terminate now. \n";
+    return -1;	
+  }
+  
+  std::string current;
+  int cur_width, cur_height;
+  int new_width, new_height; 
+  char interpolation;
+  
+  std::cout << "Current (width, height): ";
+  std::cin >> cur_width;
+  std::cin >> cur_height;
+  
+  //std::getline (std::cin, current);
+  //current = current.substr(1, current.length()-1);
+  
+  
+  //will have to splice up the current based off ( , 
+  
+  std::cout << "Enter desired resampled width: ";
+  std::cin >> new_width;
+  
+  
+  std::cout << "Enter desired resampled height: ";
+  std::cin >> new_height;
+  
+  
+  std::cout << "Use Bilinear (l) or bicubic (c) interpolation? ";
+  std::cin >> interpolation;
+  
+  
+  
+  //creates Grid object
+  //Grid grid(s1);
+  s1.close();
+  
+  return 0;
+  
+}

@@ -1,0 +1,42 @@
+/**
+*@file Grid.cpp
+*@author Megan Teahan <mteahan@ku.edu>
+*@version 1.0
+*
+*@section DESCRIPTION
+*	Executive.cpp takes in the streams that area passed in through the main.cpp file. It reads those files, passing the information to the corresponding CountList<T> and then having the ability to print the results of storing that information.
+*
+*
+*/
+
+#include "Grid.h"
+#include <iostream>
+#include <fstream>
+#include <string>
+
+
+
+/***/
+void Grid::read(std::ifstream& isFile, List<T>& list) 
+{
+	T theType;
+	while(isFile >> theType)
+	{
+		list.insert(theType);
+	};
+
+}
+/**
+* Constructor tells if nothing has passed in or not.
+*/
+Grid::Grid()
+{
+
+	std::cout << "No text files were inputted to be read. \n";
+
+}
+
+\
+
+
+

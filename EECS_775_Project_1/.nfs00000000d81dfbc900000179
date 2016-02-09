@@ -1,0 +1,70 @@
+/**
+*@file Grid.cpp
+*@author Megan Teahan <mteahan@ku.edu>
+*@version 1.0
+*
+*@section DESCRIPTION
+*	Executive.cpp takes in the streams that area passed in through the main.cpp file. It reads those files, passing the information to the corresponding CountList<T> and then having the ability to print the results of storing that information.
+*
+*
+*/
+
+#include "Grid.h"
+#include <iostream>
+#include <fstream>
+#include <string>
+
+
+
+/***/
+void Grid::read(std::ifstream& isFile) 
+{
+  //will read the text file and store it in a matrix
+
+}
+/**
+* Constructor tells if nothing has passed in or not.
+*/
+Grid::Grid()
+{
+
+	std::cout << "No text files were inputted to be read. \n";
+
+}
+
+
+//will do Bilinear Interoplation on the Grid
+void Grid::interpBilinear()
+{
+
+}
+
+//will do BiCublic Interplation on the Grid
+void Grid::interpBiCublic()
+{
+
+}
+
+//will cublically interpolate row
+void Grid::bicublic_row(int row_num)
+{
+
+}
+
+
+
+//will linearing interpolate row
+void Grid::bilinear_row(int row_num)
+{
+
+}
+
+//will linearing interpolate column
+void Grid::bilinear_column(int column_num)
+{
+
+}
+
+
+
+
