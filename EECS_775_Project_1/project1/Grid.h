@@ -27,23 +27,25 @@ public:
 	
 	
 private:
- typedef double vec3[3];
-	vec3** original;
-	vec3** changed;
-	double** c_cr; //Catmull-Rom and Cardinal matrix
+ 
+	double*** original;
+	double*** changed;
+	double c_cr[4][4]; //Catmull-Rom and Cardinal matrix
 	
 	int cur_width, cur_height;
 	int new_width, new_height;
+	int color;
 	double r_width, r_height; //width and height ratio
 
+	void initializeMat(double*** mat, int width, int height, int color);
 	
 	void read(ifstream& isFile) ;
 
-	double** mat_mult(double** mat_1, double** mat_2);
+	double spline_point(double t, double* points);
 	
 	void calc_grid();
 	
-	double calc_bilinear_data(int ri, double rf, int ci, double cf, int rgb, vec3** mat);
+	double calc_bilinear_data(int ri, int ri_1, double rf, int ci, int ci_1, double cf, int rgb, double*** mat);
 	
 	void bicublic_row(int row_num);
 	
@@ -51,9 +53,9 @@ private:
 	
 	void bilinear_column(int column_num);
 	
-	void print_row(vec3** mat, int row, int height);
+	void print_row(double*** mat, int row, int height);
 	
-	void print_mat(vec3** mat, int width, int height);
+	void print_mat(double*** mat, int width, int height, int rgb);
 		
 };
 
