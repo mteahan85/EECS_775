@@ -59,13 +59,13 @@ void Grid::read(ifstream& isFile)
   }
   calc_grid();
   
-  double* thing = new double[4];
-  thing[0] = 1;
-  thing[1] = 2;
-  thing[2] = 3;
-  thing[3] = 4;
-  
-  cout<< "mat calc: " <<  spline_point(2, thing);
+//   double* thing = new double[4];
+//   thing[0] = 1;
+//   thing[1] = 2;
+//   thing[2] = 3;
+//   thing[3] = 4;
+//   
+//   cout<< "mat calc: " <<  spline_point(2, thing);
   //    
   //    cout << "current height: " << cur_height << "\n";
   //    cout << "new height: " << new_height << "\n";
@@ -271,7 +271,7 @@ double* Grid::spline_point(double t, double** points){
     t_mat[i] = sum;
   }
   
-  double* sum[color];
+  double* sum = new double[color];
   for(int j = 0; j < color; j++){
     for(int i = 0; i < 4; i++){
       

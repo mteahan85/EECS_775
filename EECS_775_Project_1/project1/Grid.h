@@ -41,7 +41,7 @@ private:
 	
 	void read(ifstream& isFile) ;
 
-	double spline_point(double t, double* points);
+	double* spline_point(double t, double** points);
 	
 	void calc_grid();
 	
