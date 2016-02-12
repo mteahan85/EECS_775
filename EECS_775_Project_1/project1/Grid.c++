@@ -41,17 +41,7 @@ void Grid::read(ifstream& isFile)
   
    //initializeMat(original, cur_width, cur_height, 3);
    
-   original = new double**[cur_height]; 
-  
-  for(int i = 0; i < cur_height; i++){
-    
-    double** row = new double*[cur_width];
-    for(int j = 0; j < cur_width; j++){
-      row[j] = new double[color];
-      
-    }
-    original[i] = row; 
-  }
+   original = initializeMat(cur_width, cur_height, color);
   //original = new double**[cur_height]; 
   
   // while(isFile >> num){
@@ -99,7 +89,7 @@ void Grid::read(ifstream& isFile)
 //      }
 //   
 //        
-      //  print_mat(changed, new_width, new_height, color);
+        print_mat(changed, new_width, new_height, color);
   //       print_mat(changed, new_width, new_height, color);
   //    
   //   // print_row(original, 0, cur_width);
@@ -130,7 +120,7 @@ Grid::Grid(int cw, int ch, int nw, int nh, ifstream& intFile){
   new_height = nh;
   calc_grid();
   //changed = new double**[new_height]; 
-  initializeMat(changed, new_width, new_height, 3);
+  changed = initializeMat(new_width, new_height, 3);
   
   c_cr[0][0] = -0.5;
   c_cr[0][1] = 1.5;
@@ -165,9 +155,9 @@ Grid::Grid(int cw, int ch, int nw, int nh, ifstream& intFile){
 }
 
 
-void Grid::initializeMat(double*** mat, int width, int height, int color){
+double*** Grid::initializeMat( int width, int height, int color){
   
-  changed = new double**[height]; 
+  double*** mat = new double**[height]; 
   
   for(int i = 0; i < height; i++){
     
@@ -176,9 +166,9 @@ void Grid::initializeMat(double*** mat, int width, int height, int color){
       row[j] = new double[color];
       
     }
-    changed[i] = row; 
+    mat[i] = row; 
   }
-  
+  return mat;
 }
 
 void Grid::calc_grid()
@@ -225,9 +215,9 @@ void Grid::interpBiCublic()
   //from 0 to new_width -3
   //to account for the outside stuff
   //bilinear Interoplation first. Spots will be overwritten with bicublic
-//   for(int i = 0; i < new_height; i++){
-//    bilinear_row(i); 
-//   }
+  for(int i = 0; i < new_width; i++){
+   bilinear_column(i); 
+  }
   
   double cf = r_width, rf = r_height;
   double cf_total = 0,  rf_total = 0;

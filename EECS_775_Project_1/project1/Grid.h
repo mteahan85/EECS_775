@@ -37,7 +37,7 @@ private:
 	int color;
 	double r_width, r_height; //width and height ratio
 
-	void initializeMat(double*** mat, int width, int height, int color);
+	double*** initializeMat( int width, int height, int color);
 	
 	void read(ifstream& isFile) ;
 
