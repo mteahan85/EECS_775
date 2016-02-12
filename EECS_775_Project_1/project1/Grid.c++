@@ -39,33 +39,49 @@ void Grid::read(ifstream& isFile)
   cout << "rgb: " << color << "\n";
   
   
+   //initializeMat(original, cur_width, cur_height, 3);
+   
+   original = new double**[cur_height]; 
   
-  original = new double**[cur_height]; 
+  for(int i = 0; i < cur_height; i++){
+    
+    double** row = new double*[cur_width];
+    for(int j = 0; j < cur_width; j++){
+      row[j] = new double[color];
+      
+    }
+    original[i] = row; 
+  }
+  //original = new double**[cur_height]; 
   
   // while(isFile >> num){
   for(int j = 0; j < cur_height; j++){
-    double** row = new double*[cur_width];
+    
     for(int i = 0; i < cur_width; i++) 
     {
-      double* rgb_list = new double[color];
+   
       for(int k = 0; k < color; k++){
 	isFile >> num;
-	rgb_list[k] = num;
+	original[j][i][k] = num;
       }
-      
-      row[i] = rgb_list;
+
     }
-    original[j] = row;
+   
   }
+  cout << "I break in calc " ;
   calc_grid();
+  //issues not enough space to hold everything.
+  //could potetially have a different data structure but not sure what that looks like.
+  interpBiCublic();
+ cout << "I break in cubic " ;
   
-//   double* thing = new double[4];
-//   thing[0] = 1;
-//   thing[1] = 2;
-//   thing[2] = 3;
-//   thing[3] = 4;
-//   
-//   cout<< "mat calc: " <<  spline_point(2, thing);
+  //   double* thing = new double[4];
+  //   thing[0] = 1;
+  //   thing[1] = 2;
+  //   thing[2] = 3;
+  //   thing[3] = 4;
+  //   
+  //   cout<< "mat calc: " <<  spline_point(2, thing);
   //    
   //    cout << "current height: " << cur_height << "\n";
   //    cout << "new height: " << new_height << "\n";
@@ -74,9 +90,16 @@ void Grid::read(ifstream& isFile)
   //    
   // //    print_row(original, 0, cur_width);
   // //    bilinear_row(0);
-  //      for(int k = 0; k < new_width; k++){
-  //        bilinear_column(k);
-  //      }
+//        for(int k = 0; k < new_width; k++){
+//          bilinear_column(k);
+//        }
+  
+//   for(int k = 0; k < new_height; k++){
+//         bilinear_row(k);
+//      }
+//   
+//        
+      //  print_mat(changed, new_width, new_height, color);
   //       print_mat(changed, new_width, new_height, color);
   //    
   //   // print_row(original, 0, cur_width);
@@ -169,7 +192,16 @@ double Grid::calc_bilinear_data(int ri, int ri_1,  double rf, int ci, int ci_1, 
 {
   double fir_part = (1 - rf) * ( ((1-cf) * mat[ri][ci][rgb]) + (cf * mat[ri][ci_1][rgb]) );
   double sec_part = rf * ( ((1-cf) * mat[ri_1][ci][rgb]) + (cf * mat[ri_1][ci_1][rgb]));
+  
   int item = fir_part + sec_part; 
+  
+  
+ if(item < 0) { 
+  cout << "rf: " << rf << "\n"; 
+  cout << "cf: " << cf << "\n";
+  cout << "first part: " << fir_part << " second part: " << sec_part << "\n";
+  cout << "final part: "  << item << "\n";
+}  
   
   return (double) item;
   
@@ -192,42 +224,87 @@ void Grid::interpBiCublic()
   //from 0 to new_height - 3
   //from 0 to new_width -3
   //to account for the outside stuff
-  double cf,rf;
+  //bilinear Interoplation first. Spots will be overwritten with bicublic
+//   for(int i = 0; i < new_height; i++){
+//    bilinear_row(i); 
+//   }
   
-  for(int i = 0; i < new_height-3; i++){
+  double cf = r_width, rf = r_height;
+  double cf_total = 0,  rf_total = 0;
+  int ci = 0;
+  int ri_1 = 0;
+  
+  
+  int i = 1;
+  int j = 1; 
+  //don't want to subtract 3 because you don't get the closest
+  //you can to the edge
+  
+  cout << "I break in cubic " ;
+  while((ri_1 = floor(rf_total)) < cur_height-2){
     
+    if(ri_1 >= 1){
+    rf = rf_total - ri_1;
+//     cout << "row: " << i << "\n"; 
+//    // cout << "rf: " << rf << "\n";
+//     cout << "rf_total: " << rf_total << "\n";
+   // cout << "cur_height: " << cur_height << "\n";
+   // cout << "r_height: " << r_height << "\n";
     
-    for(int j = 1; j < new_width-2; j++){ //start at 0 or 1?
+    //don't want to subtract 3 because you don't get the closest
+    //you can to the edge
+    cf_total = 0;
+    j= 1;
+    while((ci = floor(cf_total)) < cur_width-2){
       
-      //add two to the initial point on both column and row_num
-      
-      //all red x's
-      double** point_info = new double*[4];
-      
-      for(int k = 0; k < 4; k++){
+      if(ci >= 1){
+	cf = cf_total - ci;
+	/*
+	cout << "cf: " << cf << "\n";
+	cout << "cf_total: " << cf_total << "\n \n";
+	cout << "column: " << j << "\n \n"; */
 	
-	double** points = new double*[4];
-	//one row of red
-	points[0] = original[i+k][j-1];
-	points[1]= original[i+k][j];
-	points[2]= original[i+k][j+1];
-	points[3] = original[i+k][j+2];
+	double** point_info = new double*[4];
 	
-	//one red x
-	point_info[k] = spline_point(cf, points);
+	for(int k = -1; k < 3; k+=1){
+
+	  double** points = new double*[4];
+	  //one row of red
+	  points[0] = original[ri_1+k][ci-1];
+	 // cout << "points[0]: " << points[0][0] << "\n";
+	  points[1]= original[ri_1+k][ci];
+	//  cout << "points[1]: " << points[1][0] << "\n";
+	  points[2]= original[ri_1+k][ci+1];
+	//  cout << "points[2]: " << points[2][0] << "\n";
+	  points[3] = original[ri_1+k][ci+2];
+	 // cout << "points[3]: " << points[3][0] << "\n";
+	  
+	
+	  //one red x
+	  point_info[k+1] = spline_point(cf, points);
+// 	  for(int m = 0; m < color; m++){
+// 	   cout << point_info[m]; 
+// 	    
+// 	  }
+	}
+	
+	//interpolates x's to get final point
+	double* final_point = spline_point(rf, point_info);
+// 	cout << "after? \n";
+// 	cout << "ri_1: " << ri_1 << "\n";
+// 	cout << "ci: " << ci << "\n";
+	changed[i][j] = final_point;
+// 	cout << "change? \n";
       }
-   
-      //interpolates x's to get final point
-      double* final_point = spline_point(rf, point_info);
-      
-      //will need to set it to some point in the new array
-      //changed[i+2][j+2][]
-      
+      cf_total += r_width;
+      j++;
       
     }
     
+    }
+    rf_total += r_height;
+    i++;
   }
-  
 }
 
 //will cublically interpolate row
@@ -276,6 +353,10 @@ double* Grid::spline_point(double t, double** points){
     for(int i = 0; i < 4; i++){
       
       sum[j] += t_mat[i] * points[i][j];
+    }
+    sum[j] = floor(sum[j]);
+    if(sum[j] < 0){
+     sum[j] = 0; 
     }
   }
   
@@ -355,43 +436,101 @@ void Grid::bilinear_column(int column_num)
   //column ratio will be cf = r_width * column_num - rounded to a certain percent
   //will also need to check to make sure it doesn't go outside the new matrix bounds
   
-  double cf = r_width * (double) column_num;
-  if(column_num == 0){
-    cf = r_width; 
+  
+  double cf_total = r_width;
+  cf_total += r_width * (double) column_num;
+  cout << "------------------------------section: " << column_num << " ---------------------------------- \n \n\n";
+  cout << "cf_total: " << cf_total << "\n \n";
+  
+  double cf = r_width;
+  int ci, ci_1;
+  
+  ci = floor(cf_total);
+  if(ci >= cur_width-1){
+    ci = cur_width-2;
   }
-  int ci = floor(cf);
-  int ci_1 = ci + 1; 
+  ci_1 = ci + 1; 
+
   
-  if(ci_1 == cur_width){
-    ci_1 = ci;    
+  cf =  cf_total - ci;
+  if(cf > 1){
+      cf = 1;
   }
-  
-  cf =  cf - ci;
-  
-  double rf;
+    	cout << "cf: " << cf << "\n";
+	cout << "cf_total: " << cf_total << "\n \n";
+	cout << "column: " << column_num << "\n \n";
+	cout << "ci: " << ci << "\n";
+	cout << "ci_1: " << ci_1 << "\n";
+	
+  double rf = r_height;
+  double rf_total = r_height;
   int ri, ri_1;
+  int i = 0; 
   
-  for(int i = 0; i < new_height; i++){
+  while((ri_1 = floor(rf_total)) < cur_height-1){
+    ri = ri_1 + 1; 
+    rf = rf_total - ri_1;
     
+// 	cout << "row: " << i << "\n";
+// 	cout << "column: " << column_num  << "\n\n";
+// 	cout << "rf: " << rf << "\n";
+// 	cout << "rf_total: " << rf_total << "\n ";
+// 	cout << "ri: " << ri << "\n";
+// 	cout << "ri_1: " << ri_1 << "\n";
     
-    rf = (double) i * r_height;
-    if(i == 0){
-      rf = r_height; 
-    }
-    
-    ri_1 = floor(rf);
-    
-    ri = ri_1 + 1;
-    if(ri == cur_height){
-      ri = ri_1; 
-    }
-    //sets the fraction based off the position to ci_1 and ci
-    rf = rf - ri_1;
     
     for(int j = 0; j < color; j++){
       changed[i][column_num][j] = calc_bilinear_data(ri, ri_1, rf, ci, ci_1, cf, j, original);
     }
+    rf_total += r_height;
+    i++;
+    
   }
+  
+  for(i; i < new_height; i++){
+   
+    ri_1 = cur_height -2;
+    ri = ri_1 + 1; 
+    rf = rf_total - ri;
+    
+//     cout << "final row: " << i << "\n";
+// 	cout << "column: " << column_num  << "\n\n";
+// 	cout << "rf: " << rf << "\n";
+// 	cout << "rf_total: " << rf_total << "\n ";
+// 	cout << "ri: " << ri << "\n";
+// 	cout << "ri_1: " << ri_1 << "\n";
+//     
+    for(int j = 0; j < color; j++){
+      changed[i][column_num][j] = calc_bilinear_data(ri, ri_1, rf, ci, ci_1, cf, j, original);
+    }
+    
+  }
+  
+ 
+  
+  
+  
+//   for(int i = 0; i < new_height; i++){
+//     
+//     
+//     rf = (double) i * r_height;
+//     if(i == 0){
+//       rf = r_height; 
+//     }
+//     
+//     ri_1 = floor(rf);
+//     
+//     ri = ri_1 + 1;
+//     if(ri == cur_height){
+//       ri = ri_1; 
+//     }
+//     //sets the fraction based off the position to ci_1 and ci
+//     rf = rf - ri_1;
+//     
+//     for(int j = 0; j < color; j++){
+//       changed[i][column_num][j] = calc_bilinear_data(ri, ri_1, rf, ci, ci_1, cf, j, original);
+//     }
+//   }
 }
 
 void Grid::print_row(double*** mat, int row, int width){
@@ -409,6 +548,8 @@ void Grid::print_mat(double*** mat, int width, int height, int rgb){
   
   for(int i = 0; i < height; i++){
     
+    cout << "------------------------------section: " << i << " ---------------------------------- \n \n\n";
+    
     for(int j = 0; j < width; j++){
       
       for(int k = 0; k < rgb; k++){
@@ -416,6 +557,7 @@ void Grid::print_mat(double*** mat, int width, int height, int rgb){
       }
     }
     cout << "\n \n \n";
+
   }
   
   ofstream myfile;
