@@ -4,7 +4,7 @@
  *@version 1.0
  *
  *@section DESCRIPTION
- *
+ *          Initial read in of file and set up of Grid object
  */
 
 #include <iostream>

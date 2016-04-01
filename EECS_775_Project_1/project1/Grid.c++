@@ -4,7 +4,7 @@
  *@version 1.0
  *
  *@section DESCRIPTION
- *	
+ *	Grid does all the computations on the matrices for interpolating the given image
  *
  *
  */
