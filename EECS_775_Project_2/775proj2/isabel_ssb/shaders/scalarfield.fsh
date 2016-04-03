@@ -62,21 +62,30 @@ void main()
 		    else
 		    {
 			    float valIn0To1 = (val - tempMin) / (tempMax - tempMin);
-			    //divide temp into thresholds
-			    float tempRange = tempMax - tempMin;
-			    if(val < tempMin + (tempRange * 0.25 )){
-			      fragmentColor = vec4(0.0, 1.0*valIn0To1, 0.0, 1.0);
-			      
-			    }else if(val < tempMin + (tempRange * 0.5 )){
-			      fragmentColor = vec4(1.0*valIn0To1, 1.0*valIn0To1, 0.0, 1.0);
-			      
-			    }else if(val < tempMin + (tempRange * 0.75 )){
-			      fragmentColor = vec4(1.0*valIn0To1, 0.5*valIn0To1, 0.0, 1.0);
-			      
+			    
+			    
+			    if(valIn0To1 < 0.75){
+			      fragmentColor = vec4(2.0 * valIn0To1, 1.0, 0.0, 1.0);
 			    }else{
-			      fragmentColor = vec4(1.0*valIn0To1, 0.0, 0.0, 1.0);
-			      
+			      fragmentColor = vec4(1.0, 2.0 * (1.0 - valIn0To1), 0.0, 1.0);
 			    }
+			    
+			    
+			    //divide temp into thresholds
+// 			    float tempRange = tempMax - tempMin;
+// 			    if(val < tempMin + (tempRange * 0.25 )){
+// 			      fragmentColor = vec4(0.0, 1.0*valIn0To1, 0.0, 1.0);
+// 			      
+// 			    }else if(val < tempMin + (tempRange * 0.5 )){
+// 			      fragmentColor = vec4(1.0*valIn0To1, 1.0*valIn0To1, 0.0, 1.0);
+// 			      
+// 			    }else if(val < tempMin + (tempRange * 0.75 )){
+// 			      fragmentColor = vec4(1.0*valIn0To1, 0.5*valIn0To1, 0.0, 1.0);
+// 			      
+// 			    }else{
+// 			      fragmentColor = vec4(1.0*valIn0To1, 0.0, 0.0, 1.0);
+// 			      
+// 			    }
 			    
 			    //map val to 0..1
 			    //fragmentColor = vec4(0.0, valIn0To1, 0.0, 1.0);
