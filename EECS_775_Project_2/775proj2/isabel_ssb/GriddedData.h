@@ -12,7 +12,7 @@ class GriddedData : public ModelView
 {
 public:
 	GriddedData(int nRowsIn, int nColsIn, int nSheetsIn, int nTimestepsIn,
-		float* attrArrayIn,
+		float* attrArrayIn, float* tempIn, float* precipIn,
 		float* uCompIn, float* vCompIn, float* wCompIn,
 		bool noGeometryShader);
 	virtual ~GriddedData();
@@ -30,10 +30,10 @@ private:
 	GLuint vboVectorField[3];
 
 	int nRows, nCols, nSheets, nTimesteps;
-	int sheetIndex, timestepIndex; // currently being displayed
-	float *attrArray, *uComp, *vComp, *wComp;
+	int sheetIndex, timestepIndex, scalarIndex; // currently being displayed
+	float *attrArray, *temp, *precip, *uComp, *vComp, *wComp;
 	double xyzMinMax[6];
-	float scalarFieldMin, scalarFieldMax;
+	float scalarFieldMin, scalarFieldMax, tempMin, tempMax, precipMin, precipMax;
 	float vectorLengthMin, vectorLengthMax;
 	int tessLevel;
 
@@ -46,10 +46,10 @@ private:
 	// PVAs and PPUs for both scalar field and vector field:
 	static GLint pvaLoc_mcCoords[2], pvaLoc_texCoords[2];
 	static GLint ppuLoc_scaleTrans[2], ppuLoc_color[2];
-	static GLint ppuLoc_nRows[2], ppuLoc_nCols[2], ppuLoc_nSheets[2], ppuLoc_sheetIndex[2], ppuLoc_timestepIndex[2];
+	static GLint ppuLoc_nRows[2], ppuLoc_nCols[2], ppuLoc_nSheets[2], ppuLoc_sheetIndex[2], ppuLoc_timestepIndex[2], ppuLoc_scalarIndex[2];
 
 	// PVAs and PPUs just for scalar field:
-	static GLint ppuLoc_scalarFieldMin, ppuLoc_scalarFieldMax;
+	static GLint ppuLoc_scalarFieldMin, ppuLoc_scalarFieldMax, ppuLoc_tempMin, ppuLoc_tempMax, ppuLoc_precipMin, ppuLoc_precipMax;
 
 	// PVAs and PPUs just for vector field:
 	static GLint ppuLoc_vectorLengthMin, ppuLoc_vectorLengthMax,

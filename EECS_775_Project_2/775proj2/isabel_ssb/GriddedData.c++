@@ -30,10 +30,15 @@ GLint GriddedData::ppuLoc_nCols[2] = { -2, -2 };
 GLint GriddedData::ppuLoc_nSheets[2] = { -2, -2 };
 GLint GriddedData::ppuLoc_sheetIndex[2] = { -2, -2 };
 GLint GriddedData::ppuLoc_timestepIndex[2] = { -2, -2 };
+GLint GriddedData::ppuLoc_scalarIndex[2] = { -2, -2 };
 
 // PVAs and PPUs just for scalar field:
 GLint GriddedData::ppuLoc_scalarFieldMin = -2;
 GLint GriddedData::ppuLoc_scalarFieldMax = -2;
+GLint GriddedData::ppuLoc_tempMin = -2;
+GLint GriddedData::ppuLoc_tempMax = -2;
+GLint GriddedData::ppuLoc_precipMin = -2;
+GLint GriddedData::ppuLoc_precipMax = -2;
 
 // PVAs and PPUs just for vector field:
 GLint GriddedData::ppuLoc_vectorLengthMin = -2;
@@ -45,11 +50,11 @@ int GriddedData::numInstances = 0;
 static const float missingDataFlag = 1.0e35;
 
 GriddedData::GriddedData(int nRowsIn, int nColsIn, int nSheetsIn, int nTimestepsIn,
-	float* attrArrayIn, float* uCompIn, float* vCompIn, float* wCompIn,
+	float* attrArrayIn, float* tempIn, float* precipIn, float* uCompIn, float* vCompIn, float* wCompIn,
 	bool noGeometryShader) :
-		nRows(nRowsIn), nCols(nColsIn), nSheets(nSheetsIn), nTimesteps(nTimestepsIn), sheetIndex(0), timestepIndex(0),
-		attrArray(attrArrayIn), uComp(uCompIn), vComp(vCompIn), wComp(wCompIn),
-		scalarFieldMin(1.0), scalarFieldMax(0.0),
+		nRows(nRowsIn), nCols(nColsIn), nSheets(nSheetsIn), nTimesteps(nTimestepsIn), sheetIndex(0), timestepIndex(0), scalarIndex(0),
+		attrArray(attrArrayIn), temp(tempIn), precip(precipIn),  uComp(uCompIn), vComp(vCompIn), wComp(wCompIn),
+		scalarFieldMin(1.0), scalarFieldMax(0.0), tempMin(1.0), tempMax(0.0), precipMin(1.0), precipMax(0.0),
 		vectorLengthMin(1.0), vectorLengthMax(0.0), tessLevel(20)
 {
 	ShaderIF::ShaderSpec* specs[] = { scalarPgmSpec, vectorPgmSpec };
@@ -75,6 +80,8 @@ GriddedData::GriddedData(int nRowsIn, int nColsIn, int nSheetsIn, int nTimesteps
 	defineGridGeometry();
 	int nValues = nRows * nCols * nSheets * nTimesteps;
 	minMax(attrArray, nValues, scalarFieldMin, scalarFieldMax, "scalarField");
+	minMax(temp, nValues, tempMin, tempMax, "Temp");
+	minMax(precip, nValues, precipMin, precipMax, "Precip");
 	float theUMin = 1.0, theVMin = 1.0, theWMin = 1.0;
 	float theUMax = 0.0, theVMax = 0.0, theWMax = 0.0;
 	minMax(uComp, nValues, theUMin, theUMax, "U");
@@ -165,12 +172,22 @@ void GriddedData::fetchGLSLVariableLocations(int i)
 			"sheetIndex");
 		ppuLoc_timestepIndex[i] = ppUniformLocation(shaderProgram[i],
 			"timestepIndex");
+		ppuLoc_scalarIndex[i] = ppUniformLocation(shaderProgram[i],
+			"scalarIndex");
 		if (i == 0) // scalar field program
 		{
 			ppuLoc_scalarFieldMin = ppUniformLocation(shaderProgram[0],
 				"scalarFieldMin");
 			ppuLoc_scalarFieldMax = ppUniformLocation(shaderProgram[0],
 				"scalarFieldMax");
+			ppuLoc_tempMin = ppUniformLocation(shaderProgram[0],
+				"tempMin");
+			ppuLoc_tempMax = ppUniformLocation(shaderProgram[0],
+				"tempMax");
+			ppuLoc_precipMin = ppUniformLocation(shaderProgram[0],
+				"precipMin");
+			ppuLoc_precipMax = ppUniformLocation(shaderProgram[0],
+				"precipMax");
 		}
 		else // vector field program
 		{
@@ -221,6 +238,11 @@ void GriddedData::handleCommand(unsigned char key, double ldsX, double ldsY)
 	  //will go forward in timesteps
 	    if(++timestepIndex >= nTimesteps){
 		timestepIndex = 0;
+	    }
+	}else if (key == 'c'){
+	  //will go forward in timesteps
+	    if(++scalarIndex >= 4){
+		scalarIndex = 0;
 	    }
 	}
 	else
@@ -286,11 +308,16 @@ void GriddedData::render()
 		glUniform1i(ppuLoc_nSheets[i], nSheets);
 		glUniform1i(ppuLoc_sheetIndex[i], sheetIndex);
 		glUniform1i(ppuLoc_timestepIndex[i], timestepIndex);
+		glUniform1i(ppuLoc_scalarIndex[i], scalarIndex);
 
 		if (i == 0) // scalar field program
 		{
 			glUniform1f(ppuLoc_scalarFieldMin, scalarFieldMin);
 			glUniform1f(ppuLoc_scalarFieldMax, scalarFieldMax);
+			glUniform1f(ppuLoc_tempMin, tempMin);
+			glUniform1f(ppuLoc_tempMax, tempMax);
+			glUniform1f(ppuLoc_precipMin, precipMin);
+			glUniform1f(ppuLoc_precipMax, precipMax);
 		}
 		else // vector field program
 		{
@@ -316,7 +343,7 @@ void GriddedData::sendBufferData()
 	glGenBuffers(1, vboScalarField);
 
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, vboScalarField[0]);
-	glBufferStorage(GL_SHADER_STORAGE_BUFFER, numBytes, attrArray, 0);
+	glBufferStorage(GL_SHADER_STORAGE_BUFFER, numBytes, temp, 0);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, vboScalarField[0]);
 
 	// The vector field:

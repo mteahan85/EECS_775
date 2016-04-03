@@ -143,8 +143,14 @@ int main(int argc, char* argv[])
 
 	//float* attrArray = readFiles("/home/miller/pub/PRECIPf/", "PRECIPf");
 	//float* attrArray = readFiles("/home/miller/pub/TCf/", "TCf");
-	float* attrArray = readFiles("/home/miller/pub/Pf/", "Pf"); //= readAttributeFile("/home/miller/pub/Pf/Pf01.bin");
-	if (attrArray == NULL)
+	float* temp = readFiles("/home/miller/pub/TCf/", "TCf"); 
+	if (temp == NULL)
+		exit(1);
+	float* precip = readFiles("/home/miller/pub/PRECIPf/", "PRECIPf");
+	if (precip == NULL)
+		exit(1);
+	float* pressure = readFiles("/home/miller/pub/Pf/", "Pf"); //= readAttributeFile("/home/miller/pub/Pf/Pf01.bin");
+	if (pressure == NULL)
 		exit(1);
 	float* uComponent = readFiles("/home/miller/pub/UVWf/", "Uf"); //readAttributeFile("/home/miller/pub/UVWf/Uf01.bin");
 	if (uComponent == NULL)
@@ -161,7 +167,7 @@ int main(int argc, char* argv[])
 		if (strcmp(argv[1], "-nogs") == 0)
 			noGeometryShader = true;
 	GriddedData* gd = new GriddedData(nRows, nCols, nSheets, nTimeSteps,
-		attrArray, uComponent, vComponent, wComponent, noGeometryShader);
+		pressure, temp, precip, uComponent, vComponent, wComponent, noGeometryShader);
 	c.addModel(gd);
 
 	initializeViewingInformation(c);
