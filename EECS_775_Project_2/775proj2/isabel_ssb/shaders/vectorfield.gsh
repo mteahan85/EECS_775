@@ -1,7 +1,7 @@
 #version 450 core
 
 layout ( points ) in;
-layout ( line_strip, max_vertices = 10 ) out;
+layout ( line_strip, max_vertices = 27 ) out; //triangle_strip
 
 layout (std430, binding = 1) buffer UVec
 {
@@ -17,7 +17,7 @@ layout (std430, binding = 3) buffer WVec
 } wvec;
 
 uniform float vectorLengthMin, vectorLengthMax;
-uniform float ldsVectorLengthScale = 50.0;
+uniform float ldsVectorLengthScale = 10.0;
 
 uniform int nRows, nCols;
 uniform int nSheets;
@@ -43,49 +43,130 @@ void outputPoint(vec4 p)
 	EmitVertex();
 }
 
+
+
+void getDot(in vec4 a, in vec4 b, out float dot){
+  dot = a.x*b.x + a.y*b.y + a.z*b.z;
+}
+
+void getLength(in vec4 a, out float l){
+  l = a.x*a.x + a.y*a.y + a.z*a.z;
+  l = sqrt(l);
+}
+
+void getThetaAngle(in vec4 a, in vec4 b, out float angle){
+
+  float dot_prod = 0; 
+  float a_l = 0;
+  float b_l = 0;
+  
+  getDot(a, b, dot_prod);
+  getLength(a, a_l);
+  getLength(b, b_l);
+  
+  float cos_theta = dot_prod / (a_l * b_l);
+  
+  angle = acos(cos_theta);
+
+}
+
+void getPhiAngle(in vec4 a,  out float angle){
+
+  float rho = a.x*a.x + a.y*a.y + a.z*a.z;
+  rho = sqrt(rho);
+  
+  
+  
+  angle = acos(a.z/rho);
+
+}
+
+
 void drawVector(in float u, in float v, in float w, in float speed)
 {
+/*
+	//float speedIn0To1 = (speed - vectorLengthMin) / (vectorLengthMax - vectorLengthMin);
+	// Make (u,v,w) be a unit vector
+	u /= speed; v /= speed; w /= speed;
+	
+	vec4 original = gl_in[0].gl_Position;
+	vec4 tip = original;
+	
+	//gl_in[0].gl_Position +
+	//	ldsVectorLengthScale*vec4(scaleTrans[0]*u, scaleTrans[2]*v, w, 0.0);
+
+	
+	//rho
+	//float rho = (tip.x -original.x)*(tip.x -original.x) + (tip.y -original.y)*(tip.y -original.y) + (tip.z -original.z)*(tip.z -original.z); //shifting center
+	float rho = tip.x*tip.x + tip.y*tip.y + tip.z*tip.z;
+	rho = sqrt(rho);
+	
+	float r = sqrt((tip.x*tip.x) + (tip.y*tip.y));
+	
+	
+	//phi
+	float phi = asin(r / rho);
+	
+	
+	
+	
+	
+	//float theta = acos((tip.x)/r);
+	float theta = acos( (tip.x/ (rho*sin(phi))) ); 
+	
+	float r_polar = sqrt(original.x*original.x + original.y*original.y);
+	float theta_p = atan(original.y/original.x);
+	
+	vec4 left =  vec4(r_polar*cos(theta_p), r_polar*sin(theta_p), original.z, original.w);
+//	vec4 left =  vec4(rho*cos(theta)*sin(phi), rho*sin(theta)*sin(phi), rho*cos(phi), original.w);
+	outputPoint(left);
+
+	
+	outputPoint(tip);
+*/
+
+//	outputPoint(gl_in[0].gl_Position);
+
+	float speedIn0To1 = (speed - vectorLengthMin) / (vectorLengthMax - vectorLengthMin);
+	// Make (u,v,w) be a unit vector
+	u /= speed; v /= speed; w /= speed;
+	vec4 diff = ldsVectorLengthScale*vec4(scaleTrans[0]*u, scaleTrans[2]*v, w, 0.0);
+	outputPoint(gl_in[0].gl_Position + diff);
+	outputPoint(gl_in[0].gl_Position + vec4(-diff.y, diff.x, 0.0, 0.0));
+	outputPoint(gl_in[0].gl_Position + vec4(diff.y, -diff.x, 0.0, 0.0));
+	
 
 
-	//will go around setting points at different positions
-	//want bigger circle, the creater the speed -- potentially
-	//start with just creating even circles
-	//will need center point to get thrown inbetween
-	//basically make min triangles
 	
-	float ang = 3.14 * 2.0 / 10.0 * 0;
-	float ang2 = 3.14 * 2.0 / 10.0 * 5;
-	vec4 offset = vec4(cos(ang) *0.05, -sin(ang) * 0.05, 0.0, 0.0);
-	vec4 offset2 = vec4(cos(ang2) *0.05, -sin(ang2) * 0.05, 0.0, 0.0);
-	vec4 center = gl_in[0].gl_Position;
-	vec4 center2 = gl_in[0].gl_Position + offset2;
-	center.x = (center.x + center2.x) /2;
+}
+
+void drawCircle(in float u, in float v, in float w, in float speed)
+{
+
+	//outputPoint(gl_in[0].gl_Position); //center of circle
+	vec4 origin = gl_in[0].gl_Position;
+	float speedIn0To1 = (speed - vectorLengthMin) / (vectorLengthMax - vectorLengthMin);
 	
-	
-	//center.x = center.x /2;
-	
-	for (int i = 0; i <= 1; i++) {
-	  // Angle between each side in radians
-	  ang = 3.14 * 2.0 / 10.0 * i;
-	  offset = vec4(cos(ang) *0.05, -sin(ang) * 0.05, 0.0, 0.0);
-	 
-	  //first point
-	  outputPoint(gl_in[0].gl_Position + offset);
-	 
-	  //center
-	//  outputPoint(center);
+	float PI = 3.14;
+	float cur_rad = 0.0;
+	float prev_rad = 0.0;
+	for(int i = 0; i < 9; i++){
+	  cur_rad = PI * i * 0.25; //around circle
 	  
-	 
 	  
-	  //second point
-	  ang = 3.14 * 2.0 / 10.0 * (i+1);
-	  offset = vec4(cos(ang) *0.05, -sin(ang) * 0.05, 0.0, 0.0);
-	//  outputPoint(gl_in[0].gl_Position + offset);
-	 
+	  outputPoint(origin); //center of circle
+	  outputPoint(origin + 0.05*vec4(cos(prev_rad), sin(prev_rad), origin.z, 0.0));
+	  outputPoint(origin + 0.05*vec4(cos(cur_rad), sin(cur_rad), origin.z, 0.0));
+	  
+	  prev_rad = cur_rad;
+	
 	}
-	
-	
-/*	
+}
+
+
+void drawArrow(in float u, in float v, in float w, in float speed)
+{
+
 	outputPoint(gl_in[0].gl_Position);
 
 	float speedIn0To1 = (speed - vectorLengthMin) / (vectorLengthMax - vectorLengthMin);
@@ -93,11 +174,9 @@ void drawVector(in float u, in float v, in float w, in float speed)
 	u /= speed; v /= speed; w /= speed;
 	outputPoint(gl_in[0].gl_Position +
 		speedIn0To1*ldsVectorLengthScale*vec4(scaleTrans[0]*u, scaleTrans[2]*v, w, 0.0));
-
-*/
-
- 		
+	
 }
+
 
 void getVector(out float u, out float v, out float w)
 {

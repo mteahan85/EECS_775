@@ -22,11 +22,11 @@ public:
 	void render();
 
 private:
-	GLuint vaoGrid[1];
+	GLuint vaoGrid[1]; 
 	GLuint vboGrid[2]; // mcPosition & texCoords
 
 	// Shader Storage Buffers (not placed in VAOs)
-	GLuint vboScalarField[1];
+	GLuint vboScalarField[2]; //--change for vo
 	GLuint vboVectorField[3];
 
 	int nRows, nCols, nSheets, nTimesteps;
@@ -46,10 +46,10 @@ private:
 	// PVAs and PPUs for both scalar field and vector field:
 	static GLint pvaLoc_mcCoords[2], pvaLoc_texCoords[2];
 	static GLint ppuLoc_scaleTrans[2], ppuLoc_color[2];
-	static GLint ppuLoc_nRows[2], ppuLoc_nCols[2], ppuLoc_nSheets[2], ppuLoc_sheetIndex[2], ppuLoc_timestepIndex[2], ppuLoc_scalarIndex[2];
+	static GLint ppuLoc_nRows[2], ppuLoc_nCols[2], ppuLoc_nSheets[2], ppuLoc_sheetIndex[2], ppuLoc_timestepIndex[2], ppuLoc_scalarIndex[2], ppuLoc_tempMin[2], ppuLoc_tempMax[2];
 
 	// PVAs and PPUs just for scalar field:
-	static GLint ppuLoc_scalarFieldMin, ppuLoc_scalarFieldMax, ppuLoc_tempMin, ppuLoc_tempMax, ppuLoc_precipMin, ppuLoc_precipMax;
+	static GLint ppuLoc_scalarFieldMin, ppuLoc_scalarFieldMax, ppuLoc_precipMin, ppuLoc_precipMax;
 
 	// PVAs and PPUs just for vector field:
 	static GLint ppuLoc_vectorLengthMin, ppuLoc_vectorLengthMax,

@@ -50,7 +50,7 @@ void initializeViewingInformation(Controller& c)
 // Parameters for the isabel data files:
 const int nRows = 500;
 const int nCols = 500;
-const int nSheets = 3; //-- mine -- only reads 3 sheets
+const int nSheets = 10; //-- mine -- only reads 3 sheets
 //const int nSheets = 100; //-- Miller's 
 const int nTimeSteps = 48;
 
@@ -146,9 +146,9 @@ int main(int argc, char* argv[])
 	float* temp = readFiles("/home/miller/pub/TCf/", "TCf"); 
 	if (temp == NULL)
 		exit(1);
-	float* precip = readFiles("/home/miller/pub/PRECIPf/", "PRECIPf");
-	if (precip == NULL)
-		exit(1);
+// 	float* precip = readFiles("/home/miller/pub/PRECIPf/", "PRECIPf");
+// 	if (precip == NULL)
+// 		exit(1);
 	float* pressure = readFiles("/home/miller/pub/Pf/", "Pf"); //= readAttributeFile("/home/miller/pub/Pf/Pf01.bin");
 	if (pressure == NULL)
 		exit(1);
@@ -167,7 +167,7 @@ int main(int argc, char* argv[])
 		if (strcmp(argv[1], "-nogs") == 0)
 			noGeometryShader = true;
 	GriddedData* gd = new GriddedData(nRows, nCols, nSheets, nTimeSteps,
-		pressure, temp, precip, uComponent, vComponent, wComponent, noGeometryShader);
+		pressure, temp, NULL, uComponent, vComponent, wComponent, noGeometryShader);
 	c.addModel(gd);
 
 	initializeViewingInformation(c);
@@ -175,6 +175,10 @@ int main(int argc, char* argv[])
 	glClearColor(1.0, 1.0, 1.0, 1.0);
 
 	c.run();
+	
+	delete temp;
+	//delete precip;
+	delete pressure;
 
 	return 0;
 }
