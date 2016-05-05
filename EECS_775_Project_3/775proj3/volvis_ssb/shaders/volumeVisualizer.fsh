@@ -128,33 +128,36 @@ vec4 traceRay(in vec3 mcPoint, in vec3 mcLineOfSight)
 	float v, maxVal = 0;
 	float num = 0; 
 	float vTotal = 0;
+	bool binary = false;
 	while (mcToRCS(mcPoint, ri, rf, ci, cf, si, sf)) //what does this mean
 	{
 		v = getVal(ri, rf, ci, cf, si, sf); //i'm not really sure what's going on here
 		
 		if (rayFunction == 1){ //binary
-			//do I need to accumulate the values?
+			if(v >= rayFunctionParameter){//if hit point in ray that hits this threshold then turns it true
+			 binary = true;  
+			}
 		}if (rayFunction == 2){ //finds overall max
 			// BEGIN "MAX", part 1
 			if (v > maxVal)
 				maxVal = v;
 			// END "MAX", part 1
-		}else if (rayFunction == 3){ //averages the values
+		}else if (rayFunction == 3 || rayFunction == 4){ //averages the values
 			num++;
 			vTotal += v;
-			
 		}
 		mcPoint += stepSize*mcLineOfSight;
 	}
 	vec4 colorToReturn;
 	if(rayFunction == 1){ //not quite turning out like expected
-	  if(v >= rayFunctionParameter){
+	  
+	  // BEGIN "BINARY", part 2
+	  if(binary){
 	    colorToReturn = vec4(1.0, 1.0, 1.0, 1.0);
 	  }else{
 	    colorToReturn = vec4(0.0, 0.0, 0.0, 1.0);
 	  }
-	  
-	  
+	  // END "BINARY", part 2
 	}else if (rayFunction == 2){
 		// BEGIN "MAX", part 2
 		v = maxVal / 255.0;
@@ -163,10 +166,13 @@ vec4 traceRay(in vec3 mcPoint, in vec3 mcLineOfSight)
 	}else if (rayFunction == 3){
 		// BEGIN "AVERAGE"
 		vTotal = vTotal / num;
-		vTotal / 255.0;
-		colorToReturn = vec4(vTotal, vTotal, vTotal, 1.0);
-	  
-		
+		vTotal = vTotal / 255.0;
+		colorToReturn = vec4(vTotal, vTotal, vTotal, 1.0);	
+	}else if (rayFunction == 4){ //currently the same as average. need to learn out to scale sum to 0 to 1 scale
+		// BEGIN "SUM" -- scale sum to 0 to 1
+		float maxSum = num * 255.0;
+		v = vTotal / maxSum; //for scaling
+		colorToReturn = vec4(v, v, v, 1.0);	
 	}
 	
 	return colorToReturn;

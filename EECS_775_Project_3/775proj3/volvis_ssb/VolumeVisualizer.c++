@@ -70,7 +70,7 @@ void VolumeVisualizer::handleCommand(unsigned char key, double ldsX, double ldsY
 	// Handle events you want, setting "handled" to true if you handle one...
 	if (key == 'r') //shuffle through the different ray functions
 	{
-		if (++rayFunction >= 4){ //0 stands for the basic cube. 1-3 stands for the actual ray tracing
+		if (++rayFunction >= 5){ //0 stands for the basic cube. 1-3 stands for the actual ray tracing
 			rayFunction = 0;
 		}	
 		handled = true;
