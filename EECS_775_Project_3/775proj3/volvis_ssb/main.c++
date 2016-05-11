@@ -45,9 +45,65 @@ void initializeViewingInformation(Controller& c)
 	ModelView::setProjection(ORTHOGONAL);
 }
 
+bool getRGBATable(std::string fileName, float*& rgba0, float*& rgba1, int*& rgba0Steps, int*& rgba1Steps, int& nSteps){
+  
+	std::ifstream rgbaFile(fileName.c_str());
+	if (!rgbaFile.good())
+	{
+		std::cerr << "Could not open " << fileName << " for reading.\n";
+		return false;
+	}
+  
+	rgbaFile >> nSteps;
+	int rgbaSize = nSteps*4;
+	rgba0 = new float[rgbaSize];
+	rgba1 = new float[rgbaSize];
+	rgba0Steps = new int[nSteps];
+	rgba1Steps = new int[nSteps];
+	
+	for(int i = 0; i < nSteps; i++){
+	  int num = i * 4;
+	  
+	  rgbaFile >> rgba0Steps[i];//reading lower step number
+	  rgbaFile >> rgba0[num]; //reading r for lower step
+	  rgbaFile >> rgba0[num+1]; //reading g for lower step
+	  rgbaFile >> rgba0[num+2]; //reading b for lower step
+	  rgbaFile >> rgba0[num+3]; //reading a for lower step
+	  
+	  
+	  rgbaFile >> rgba1Steps[i]; //reading upper step number
+	  rgbaFile >> rgba1[num]; //reading r for lower step
+	  rgbaFile >> rgba1[num+1]; //reading g for upper step
+	  rgbaFile >> rgba1[num+2]; //reading b for upper step
+	  rgbaFile >> rgba1[num+3]; //reading a for upper step
+	  
+	}
+	
+	
+	for(int i = 0; i < rgbaSize; i++){
+	 
+	  if(i % 4 == 0 && i != 0){
+	   std::cout << "\n";  
+	  }
+	  
+	  std::cout << rgba0[i] << " ";
+	}
+	
+	
+	for(int i = 0; i < nSteps; i++){
+	 
+	  std::cout << "step " << i << " lower: " << rgba0Steps[i] << " upper: " << rgba1Steps[i] << "\n"; 
+	  
+	}
+	
+	return true;
+  
+}
+
+
 bool getData(const char* configFileName, int& nRows, int& nCols, int& nSheets,
-	double& rowScaleFactor, double& colScaleFactor, double& sheetScaleFactor,
-	int*& voxels)
+	double& rowScaleFactor, double& colScaleFactor, double& sheetScaleFactor, int*& voxels, 
+	float*& rgba0, float*& rgba1, int*& rgba0Steps, int*& rgba1Steps, int& nSteps)
 {
 	std::ifstream config(configFileName);
 	if (!config.good())
@@ -61,6 +117,13 @@ bool getData(const char* configFileName, int& nRows, int& nCols, int& nSheets,
 	std::string voxelFileName;
 	config >> voxelFileName;
 	
+	std::string rgbaTable;
+	config >> rgbaTable;
+	
+	
+	if(!getRGBATable(rgbaTable, rgba0, rgba1, rgba0Steps, rgba1Steps, nSteps)){
+	 return false; 
+	}
 	//may also attach extra values on the end of the line call
 	//config >> stepSize; 
 	//config >> rayFunctionParameter;
@@ -83,6 +146,7 @@ bool getData(const char* configFileName, int& nRows, int& nCols, int& nSheets,
 	delete [] voxels8Bit;
 	return true;
 }
+
 
 
 void extraInputs(double& step, double& ray, double**& colorRamp){
@@ -139,12 +203,17 @@ int main(int argc, char* argv[])
 		return 0;
 	}
 
-	int nRows, nCols, nSheets;
+	int nRows, nCols, nSheets, nSteps;
 	double stepSize; 
 	double rowScaleFactor, colScaleFactor, sheetScaleFactor;
 	int* voxels;
+	int* rgba0Steps;
+	int* rgba1Steps;
+	float* rgba0;
+	float* rgba1;
 	if (getData(argv[1], nRows, nCols, nSheets,
-		rowScaleFactor, colScaleFactor, sheetScaleFactor, voxels))
+		rowScaleFactor, colScaleFactor, sheetScaleFactor, voxels, 
+		rgba0, rgba1, rgba0Steps, rgba1Steps, nSteps))
 	{
 		GLFWController c("Voxel Grid", MVC_USE_DEPTH_BIT);
 		c.reportVersions(std::cout);
@@ -153,7 +222,8 @@ int main(int argc, char* argv[])
 			"shaders/volumeVisualizer.fsh");
 		VolumeVisualizer* vv = new VolumeVisualizer(
 			nRows, nCols, nSheets,
-			rowScaleFactor, colScaleFactor, sheetScaleFactor, voxels);
+			rowScaleFactor, colScaleFactor, sheetScaleFactor, voxels, 
+			rgba0, rgba1,  nSteps, rgba0Steps, rgba1Steps);
 		c.addModel(vv);
 
 		initializeViewingInformation(c);

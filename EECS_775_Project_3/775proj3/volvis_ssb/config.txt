@@ -1,4 +1,16 @@
-256 256 256 1.0 1.0 1.0 /home/miller/Data/volvisdata/8bpv/skull.raw
+301 324 56 1.0 1.0 1.4 /home/miller/Data/volvisdata/8bpv/lobster.raw rgba_table.txt
+
+256 256 256 1.0 1.0 1.0 /home/miller/Data/volvisdata/8bpv/skull.raw grayscale.txt
+
+64 64 64 1.0 1.0 1.0 /home/miller/Data/volvisdata/8bpv/neghip.raw rgba_table.txt
+
+41 41 41 1.0 1.0 1.0 /home/miller/Data/volvisdata/8bpv/nucleon.raw nucleon_rgba.txt
+
+128 128 128 1.0 1.0 1.0 /home/miller/Data/volvisdata/8bpv/hydrogenAtom.raw hydrogen_rgba.txt
+
+256 256 256 1.0 1.0 1.0 /home/miller/Data/volvisdata/8bpv/foot.raw foot_rgba.txt
+
+
 
 
 256 256 256 1.0 1.0 1.0 /home/miller/Data/volvisdata/8bpv/aneurism.raw

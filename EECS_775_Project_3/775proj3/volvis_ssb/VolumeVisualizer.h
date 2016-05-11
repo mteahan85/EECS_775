@@ -12,8 +12,8 @@ class VolumeVisualizer : public ModelView3D
 {
 public:
 	VolumeVisualizer(int nRowsIn, int nColsIn, int nSheetsIn,
-		double rowScaleFactor, double colScaleFactor, double sheetScaleFactor,
-		int* attrArrayIn);
+		double rowScaleFactor, double colScaleFactor, double sheetScaleFactor, int* attrArrayIn,
+		float* rgba0In, float* rgba1In, int nStepsIn, int* rgba0StepsIn, int* rgba1StepsIn);
 	virtual ~VolumeVisualizer();
 
 	void getMCBoundingBox(double* xyzLimits) const;
@@ -29,18 +29,25 @@ private:
 	// Shader Storage Buffers (not placed in VAOs)
 	GLuint vboVoxelGrid[1];
 
-	int nRows, nCols, nSheets;
+	int nRows, nCols, nSheets, nSteps;
 	float cellSizeX, cellSizeY, cellSizeZ;
-	int *attrArray;
+	int* attrArray;
+	int* rgba0Steps;
+	int* rgba1Steps;
+	float* rgba0;
+	float* rgba1;
 	double xyzMinMax[6];
-	int rayFunction, rayFunctionParameter;
-	float stepSize;
+	int rayFunction, rayFunctionParameter, tri;
+	float stepSize, preGain;
 
 	// PPUs for voxel grid
 	static GLint ppuLoc_nRows, ppuLoc_nCols, ppuLoc_nSheets;
 	static GLint ppuLoc_cellSizeX, ppuLoc_cellSizeY, ppuLoc_cellSizeZ;
 	// PPUs for rendering options
-	static GLint ppuLoc_rayFunction, ppuLoc_rayFunctionParameter, ppuLoc_stepSize;
+	static GLint ppuLoc_rayFunction, ppuLoc_rayFunctionParameter, ppuLoc_tri; 
+	static GLint ppuLoc_stepSize, ppuLoc_preGain;
+	static GLint ppuLoc_rgba0, ppuLoc_rgba1, ppuLoc_rgba0Steps, ppuLoc_rgba1Steps, ppuLoc_nSteps;
+	
 
 	static void fetchGLSLVariableLocations();
 
